@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+# 怎么理解hikari，跟MySQL的关系是什么样的？
+# Hikari（连接池）和线程池（Thread Pool）在设计理念上非常相似
+# 想象你的 Java 应用是一个忙碌的餐厅，MySQL 数据库是后厨，里面有很多厨师（数据库资源）。每次顾客（你的代码）点菜（执行 SQL 查询），都需要服务员（数据库连接）去后厨传递订单。如果每次点菜都临时雇一个新服务员，效率会很低（建立连接很耗时）。Hikari 就像一个 服务员管理团队，提前雇好了一群服务员（连接池），让他们待命，随时复用，这样点菜和送菜的速度就快多了！😄
+#
+spring:
+  datasource: # 数据源的相关配置
+    type: com.zaxxer.hikari.HikariDataSource      # 数据源的类型，可以更改为其他的数据源配置，比如druid
+    driver-class-name: com.mysql.cj.jdbc.Driver      # mysql/MariaDB 的数据库驱动类名称
+    url: jdbc:mysql:///my-douyin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+    username: root
+    password: 33321480
+
+    hikari:
+      connection-timeout: 30000               # 等待连接池分配连接的最大时间（毫秒），超过这个时长还没有可用的连接，则会抛出SQLException
+      minimum-idle: 5                         # 最小连接数
+      maximum-pool-size: 20                   # 池子里最多有多少个连接（服务员）
+      auto-commit: true                       # 自动提交
+      idle-timeout: 600000                    # 连接超时的最大时长（毫秒），超时则会被释放（retired）
+      pool-name: DataSourceHikariCP           # 连接池的名字
+      max-lifetime: 18000000                  # 连接池的最大生命时长（毫秒），超时则会被释放（retired）
+      connection-test-query: SELECT 1
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    password: 33321480
+

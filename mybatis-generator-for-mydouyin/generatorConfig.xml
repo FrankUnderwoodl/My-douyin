@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="MysqlContext" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- 通用mapper所在目录 -->
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+            <property name="mappers" value="com.yufeng.my.mapper.mapper.MyMapper"/>
+        </plugin>
+
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/my-douyin"
+                        userId="root"
+                        password="33321480">
+        </jdbcConnection>
+
+        <!-- 对应生成的pojo所在包 -->
+        <javaModelGenerator targetPackage="com.yufeng.pojo" targetProject="mybatis-generator-for-mydouyin/src/main/java"/>
+
+		<!-- 对应生成的mapper所在目录 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="mybatis-generator-for-mydouyin/src/main/resources"/>
+
+		<!-- 配置mapper对应的java映射 -->
+        <javaClientGenerator targetPackage="com.yufeng.mapper" targetProject="mybatis-generator-for-mydouyin/src/main/java" type="XMLMAPPER"/>
+
+        <!-- 数据库表 -->
+        <table tableName="comment"/>
+        <table tableName="fans"/>
+        <table tableName="my_liked_vlog"/>
+        <table tableName="users"/>
+        <table tableName="vlog"/>
+
+
+    </context>
+</generatorConfiguration>
