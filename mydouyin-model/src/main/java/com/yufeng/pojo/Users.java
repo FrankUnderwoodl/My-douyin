@@ -4,9 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import java.util.Date;
 
-/**
- * @author Lzm
- */
 public class Users {
     @Id
     private String id;

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yufeng.mapper.FansMapperCustom" >
+<!--  <resultMap id="BaseResultMap" type="com.yufeng.pojo.Fans" >-->
+<!--    &lt;!&ndash;-->
+<!--      WARNING - @mbg.generated  表示这段代码是由 MyBatis Generator 工具自动生成的，不建议手动修改。-->
+<!--      数据库列 vloger_id 映射到 vlogerId 属性-->
+<!--      数据库列 fan_id 映射到 fanId 属性-->
+<!--      数据库列 is_fan_friend_of_mine 映射到 isFanFriendOfMine 属性-->
+<!--    &ndash;&gt;-->
+<!--    <id column="id" property="id" jdbcType="VARCHAR" />-->
+<!--    <result column="vloger_id" property="vlogerId" jdbcType="VARCHAR" />-->
+<!--    <result column="fan_id" property="fanId" jdbcType="VARCHAR" />-->
+<!--    <result column="is_fan_friend_of_mine" property="isFanFriendOfMine" jdbcType="INTEGER" />-->
+<!--  </resultMap>-->
+
+  <select id="queryMyFollows" resultType="com.yufeng.vo.VlogerVO" parameterType="map">
+
+    SELECT
+        u.id AS vlogerId,
+        u.nickname AS nickname,
+        u.face AS face
+    FROM
+        fans f
+    LEFT JOIN
+        users u
+    ON
+        f.vloger_id=u.id <!-- 次要的筛选条件 -->
+    WHERE
+        f.fan_id=#{paramMap.myId} <!-- 参数是当前用户的id,也就是主表(fans)中的主要筛选条件 -->
+    ORDER BY
+       u.nickname
+    ASC  <!-- 按照字母顺序从 A 到 Z (Ascending) -->
+
+  </select>
+
+    <select id="queryMyFans" resultType="com.yufeng.vo.FansVO" parameterType="map">
+
+        SELECT
+            u.id AS fanId,
+            u.nickname AS nickname,
+            u.face AS face
+        FROM
+            fans f
+        LEFT JOIN
+            users u
+        ON
+            f.fan_id=u.id <!-- 次要的筛选条件 -->
+        WHERE
+            f.vloger_id=#{paramMap.myId} <!-- 参数是当前用户的id,也就是主表(fans)中的主要筛选条件 -->
+        ORDER BY
+            u.nickname
+        ASC  <!-- 按照字母顺序从 A 到 Z (Ascending) -->
+
+    </select>
+
+</mapper>

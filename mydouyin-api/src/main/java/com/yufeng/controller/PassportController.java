@@ -1,5 +1,6 @@
 package com.yufeng.controller;
 
+import com.yufeng.base.BaseInfoProperties;
 import com.yufeng.bo.RegistLoginBO;
 import com.yufeng.grace.result.GraceJSONResult;
 import com.yufeng.grace.result.ResponseStatusEnum;
@@ -52,6 +53,9 @@ public class PassportController extends BaseInfoProperties {
      */
     @PostMapping("/getSMSCode")
     public Object getSMSCode(@RequestParam String mobile, HttpServletRequest request) throws Exception {
+
+        log.info("获取验证码，手机号: " + mobile);
+
         // 1. 判断手机号是否为空
         if(mobile == null || mobile.isEmpty()) {
             return GraceJSONResult.errorCustom(ResponseStatusEnum.valueOf("手机号不能为空"));
@@ -98,13 +102,14 @@ public class PassportController extends BaseInfoProperties {
 
     /**
      * @describe 对应前端的loginOrRegist函数，目的是通过手机号和验证码来一键登录
-     * @param registLoginBO 由前端传入的对象
+     * @param registLoginBO 由前端传入的json对象
      * @Valid 这个注解是用来‘开启验证对象’，也就是判断前端传来的RegistLoginBO对象是否符合要求
      */
     @PostMapping("/login")
     public Object login(@Valid @RequestBody RegistLoginBO registLoginBO,
                         // BindingResult result,   // 对代码有侵入性，因为当前的Controller需要依赖其他方法的结果。解决的方法就是通过这个BlindingResult如果有错误，就自动抛异常，就可以被我的GraceExceptionHandler捕获
                         HttpServletRequest request) {
+        log.info("用户登录，手机号: " + registLoginBO.getMobile() + ", 验证码: " + registLoginBO.getSmsCode());
 
         // 0. 判断BindingResult中是否保存了错误的验证信息，如果有，则需要返回到前端
        // if( result.hasErrors() ) {
@@ -150,6 +155,8 @@ public class PassportController extends BaseInfoProperties {
     @PostMapping("logout")
     public GraceJSONResult logout(@RequestParam String userId,
                                   HttpServletRequest request) throws Exception {
+
+        log.info("用户退出登录，userId: " + userId);
 
         // 后端只需要清除与用户会话的token信息即可，当然前端也需要清除，清除本地app中的用户信息和token会话信息
         redis.del(REDIS_USER_TOKEN + ":" + userId);

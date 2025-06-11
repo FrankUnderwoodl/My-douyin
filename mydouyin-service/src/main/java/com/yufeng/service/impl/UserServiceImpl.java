@@ -2,6 +2,7 @@ package com.yufeng.service.impl;
 
 import com.yufeng.bo.UpdatedUserBO;
 import com.yufeng.enums.Sex;
+import com.yufeng.enums.UserInfoModifyType;
 import com.yufeng.enums.YesOrNo;
 import com.yufeng.exceptions.GraceException;
 import com.yufeng.grace.result.ResponseStatusEnum;
@@ -146,15 +147,17 @@ public class UserServiceImpl implements UserService {
      * 在你的`UpdateUserInfo`方法中，当你更新用户信息时，可能涉及多个操作（更新多个字段或甚至多个表），事务确保这些操作作为一个整体要么成功要么失败，保持数据的一致性。
      * 如果不使用事务管理，默认情况下，JDBC连接处于自动提交模式，每个SQL语句执行后会立即提交到数据库，这样可能导致数据不一致的状态。
      */
-    @Transactional // 因为涉及到数据库的更新操作，所以需要事务管理
+    @Transactional // 因为需要涉及到数据库的更新操作，所以需要事务管理
     @Override
     public Users UpdateUserInfo(UpdatedUserBO updatedUserBO) {
         Users pendingUser = new Users(); // pending的意思是“待处理的”
-        BeanUtils.copyProperties(updatedUserBO, pendingUser);
-        // 接下来通过userMapper来更新数据库中的用户信息
-        int result = usersMapper.updateByPrimaryKeySelective(pendingUser);// 只更新非空字段，也就是如果有字段为null就不更新
+        BeanUtils.copyProperties(updatedUserBO, pendingUser); // 将updatedUserBO的值赋值给pendingUser，因为User对应了数据库中的表，所以需要copyProperties。
+
+        // 接下来通过userMapper的updateByPrimaryKeySelective方法来更新数据库中的用户信息
+        int result = usersMapper.updateByPrimaryKeySelective(pendingUser); // 只更新非空字段，也就是该对象如果有字段为null就不更新进数据库中
+
         // 这里的result是更新操作影响的行数，如果result大于0，说明更新成功
-        if (result != 1) {
+        if (result == 0) {
             // 如果更新失败，抛出异常
             GraceException.display(ResponseStatusEnum.USER_UPDATE_ERROR);
 
@@ -162,4 +165,47 @@ public class UserServiceImpl implements UserService {
 
         return getUser(updatedUserBO.getId());
     }
+
+
+    /**
+     * 根据传入的type类型，来判断是修改头像还是背景图片
+     * @param updatedUserBO 客户端传来的对象
+     * @param type 修改类型(上传头像还是背景图片)
+     */
+    @Override
+    public Users UpdateUserInfo(UpdatedUserBO updatedUserBO, Integer type) {
+        // 这里创建了一个专门针对 Users 类的查询条件对象Example
+        Example example = new Example(Users.class);
+        Example.Criteria criteria = example.createCriteria();
+
+        // 判断type类型是否正确
+        if (type == UserInfoModifyType.NICKNAME.type) {
+            criteria.andEqualTo("nickname", updatedUserBO.getNickname());
+            Users user = usersMapper.selectOneByExample(example);
+            if (user != null) { // 如果查询到有相同的昵称，就抛出异常
+                GraceException.display(ResponseStatusEnum.USER_INFO_UPDATED_NICKNAME_EXIST_ERROR);
+            }
+        }
+
+        //
+        if (type == UserInfoModifyType.IMOOCNUM.type) {
+            criteria.andEqualTo("imoocNum", updatedUserBO.getImoocNum());
+            Users user = usersMapper.selectOneByExample(example);
+            if (user != null) { // 如果查询到有相同的imoocNum，就抛出异常
+                GraceException.display(ResponseStatusEnum.USER_INFO_UPDATED_NICKNAME_EXIST_ERROR);
+            }
+
+
+            Users tempUser =  getUser(updatedUserBO.getId());
+            if (tempUser.getCanImoocNumBeUpdated() == YesOrNo.NO.type) {
+                GraceException.display(ResponseStatusEnum.USER_INFO_CANT_UPDATED_IMOOCNUM_ERROR);
+            }
+            // 把canImoocNumBeUpdated的值改为NO
+            updatedUserBO.setCanImoocNumBeUpdated(YesOrNo.NO.type);
+        }
+
+        // 这里再将updatedUserBO的值赋值给pendingUser↓
+        return this.UpdateUserInfo(updatedUserBO);
+    }
+
 }

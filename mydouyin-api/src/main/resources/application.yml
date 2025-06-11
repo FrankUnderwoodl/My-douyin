@@ -11,6 +11,8 @@ server:
 # 问:这个spring区域是用来干嘛的？
 # 答: spring区域是用来配置spring框架的相关属性的，比如spring的banner、servlet、mybatis等
 spring:
+    application:
+        name: mydouyin-nacos  # 应用名称，注册到Nacos时使用
     profiles:
         active: dev
 #    banner:

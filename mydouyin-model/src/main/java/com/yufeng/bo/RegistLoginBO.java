@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 
 /**
  * @author Lzm
- * @describe 这个类型叫做BO（Business Object），也就是业务对象，一般用于前端传来后端，后端需要用的对象
+ * @describe 这个类型叫做BO（Business Object），也就是业务对象，一般是前端的json对象，传去给后端
  * '@NotBlank'、'@Length是hibernate框架的注解，用来进行参数校验的注解
  */
 @Data

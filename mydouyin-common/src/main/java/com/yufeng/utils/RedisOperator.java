@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Title: Redis 工具类，目的是封装一些常用的 Redis 操作
+ * @Title Redis 工具类，目的是封装一些常用的 Redis 操作
  * @author 梁振明
  */
 @Component

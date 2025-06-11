@@ -11,7 +11,7 @@ import java.util.Date;
 
 /**
  * @author Lzm
- * VO指的是View Object，表示视图对象，这个对象前端一般用于展示数据
+ * VO指的是View Object，表示视图对象，这个对象前端一般用于展示数据(也就是需要将这个对象发给前端)
  */
 @Data
 @AllArgsConstructor
@@ -40,7 +40,7 @@ public class UsersVO {
     // 添加前端所需要的关注数和粉丝数
     private Integer myFollowsCounts;
     private Integer myFansCounts;
-    //    private Integer myLikedVlogCounts;
+    private Integer myLikedVlogCounts;
     // 获赞总数
     private Integer totalLikeMeCounts;
 }

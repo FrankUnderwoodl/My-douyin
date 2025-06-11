@@ -1,6 +1,6 @@
 package com.yufeng.intercepter;
 
-import com.yufeng.controller.BaseInfoProperties;
+import com.yufeng.base.BaseInfoProperties;
 import com.yufeng.exceptions.GraceException;
 import com.yufeng.grace.result.ResponseStatusEnum;
 import com.yufeng.utils.IPUtil;
@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 public class PassportInterceptor extends BaseInfoProperties implements HandlerInterceptor {
 
     /**
-     * 作用:每当请求到达Controller之前，都会执行这个方法
+     * 作用:每当请求到达PassportController之前，都会执行这个方法
      */
     @Override
     public boolean preHandle(HttpServletRequest request,

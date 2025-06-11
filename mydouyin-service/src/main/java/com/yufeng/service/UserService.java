@@ -29,4 +29,9 @@ public interface UserService {
      */
     public Users UpdateUserInfo(UpdatedUserBO updatedUserBO);
 
+    /**
+     * 用户信息修改，需要判断前端传入的type
+     */
+    public Users UpdateUserInfo(UpdatedUserBO updatedUserBO, Integer type);
+
 }

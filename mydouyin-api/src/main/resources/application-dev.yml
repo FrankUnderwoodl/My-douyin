@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${port:8080} # 端口号，默认8080，可以通过环境变量或命令行参数覆盖
 
 # 怎么理解hikari，跟MySQL的关系是什么样的？
 # Hikari（连接池）和线程池（Thread Pool）在设计理念上非常相似
@@ -12,7 +12,8 @@ spring:
     url: jdbc:mysql:///my-douyin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
     username: root
     password: 33321480
-
+# hikari存在的意思是什么？
+# # Hikari 是一个高性能的 JDBC 连接池，它的存在是为了提高数据库连接的效率和性能。就像一个餐厅的服务员团队，Hikari 预先创建并管理一组数据库连接（就像服务员），当应用需要访问数据库时，可以快速复用这些连接，而不是每次都重新建立连接，这样可以大大减少延迟和资源消耗.
     hikari:
       connection-timeout: 30000               # 等待连接池分配连接的最大时间（毫秒），超过这个时长还没有可用的连接，则会抛出SQLException
       minimum-idle: 5                         # 最小连接数
@@ -28,4 +29,40 @@ spring:
     port: 6379
     database: 0
     password: 33321480
+
+  data:
+    mongodb:
+      uri: mongodb://root:33321480@localhost:27017
+      database: mydouyin
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: root
+    password: 33321480
+    virtual-host: mydouyin
+
+#  application:
+#    name: mydouyin-nacos # 作为微服务的名称，注册到Nacos时使用
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848  # Nacos服务地址
+
+# 打开监控
+management:
+  endpoint:
+    web:
+      exposure:
+        include: '*'
+
+# MinIO 配置
+minio:
+  endpoint: http://localhost:9000      # MinIO服务地址
+  fileHost: http://localhost:9000      # 文件地址host
+  bucketName: mydouyin                      # 存储桶bucket名称
+  accessKey: root                         # 用户名
+  secretKey: 33321480                     # 密码
+  imgSize: 1024                           # 图片大小限制，单位：m
+  fileSize: 1024                          # 文件大小限制，单位：m
 

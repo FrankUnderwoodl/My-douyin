@@ -26,7 +26,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GraceExceptionHandler {
 
-    // @ExceptionHandler(MyCustomException.class)的意思是专门处理MyCustomException这个异常,随后进入到returnMyException函数,将一个json抛给前端
+    // @ExceptionHandler(MyCustomException.class)这个注解的意思是专门处理MyCustomException这个异常,随后进入到returnMyException函数,将一个json抛给前端
     @ExceptionHandler(MyCustomException.class)
     @ResponseBody
     public GraceJSONResult returnMyException(MyCustomException e) {
@@ -35,7 +35,7 @@ public class GraceExceptionHandler {
     }
 
 
-    // 问: 怎么理解这个异常处理器的作用
+    // 问: 怎么理解这个异常处理器的作用？
     // 答: 这个异常处理器的作用是捕获所有的MethodArgumentNotValidException异常(也就是BindingResult result)，并返回一个GraceJSONResult对象给前端(@ResponseBody的加持下)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
@@ -47,7 +47,8 @@ public class GraceExceptionHandler {
 
 
 
-
+    // 最大上传文件大小异常处理器
+    // 也就是说，如果上传的文件超过了2MB，就会抛出MaxUploadSizeExceededException异常，然后进入到这个方法中
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseBody
     public GraceJSONResult returnMaxUploadSize(MaxUploadSizeExceededException e) {

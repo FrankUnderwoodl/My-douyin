@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yufeng.mapper.VlogMapperCustom" >
+
+  <!-- 多表查询 -->
+  <select id="getIndexVlogList" parameterType="map" resultType="com.yufeng.vo.IndexVlogVO">
+    SELECT
+        v.id as vlogId,
+        v.vloger_id as vlogerId,
+        u.face as vlogerFace,
+        u.nickname as vlogerName,
+        v.title as content,
+        v.url as url,
+        v.cover as cover,
+        v.width as width,
+        v.height as height,
+        v.like_counts as likeCounts,
+        v.comments_counts as commentsCounts,
+        v.is_private as isPrivate
+    FROM
+        vlog v
+    LEFT JOIN
+        users u
+    ON
+        v.vloger_id = u.id
+    WHERE
+        v.is_private = 0
+
+      <!--paramMap这个是接口传入的参数，paramMap是一个Map类型的对象，里面存放了所有的参数。
+      意思是：如果paramMap中有一个名为"search"的键，且其值不为null且不为空字符串，则添加这个WHERE条件。
+      从业务的角度来看，如果用户在搜索框中输入了内容，那么就会有这个参数传入，如果seach这个key的value为空，那就证明这是首页。-->
+    <if test="paramMap.search != null and paramMap.search != ''">
+      AND v.title like '%${paramMap.search}%'
+    </if>
+    ORDER BY
+      v.created_time
+    DESC
+  </select>
+
+
+  <!--  查询视频详情  -->
+  <select id="getVlogDetailById" parameterType="map" resultType="com.yufeng.vo.IndexVlogVO">
+    SELECT
+      v.id as vlogId,
+      v.vloger_id as vlogerId,
+      u.face as vlogerFace,
+      u.nickname as vlogerName,
+      v.title as content,
+      v.url as url,
+      v.cover as cover,
+      v.width as width,
+      v.height as height,
+      v.like_counts as likecounts,
+      v.comments_counts as commentsCounts,
+      v.is_private as isPrivate
+    FROM
+      vlog v
+    LEFT JOIN
+      users u
+    ON
+      v.vloger_id = u.id
+    WHERE
+      v.id = #{paramMap.vlogId} <!--用户可能上传了不止一个视频，所以这里要根据视频的id来查询具体的哪一个-->
+  </select>
+
+
+
+    <!-- 这里厉害了，用到了三张表之间的查询 -->
+    <select id="getMyLikedVlogList" parameterType="map" resultType="com.yufeng.vo.IndexVlogVO">
+        SELECT
+          v.id as vlogId,
+          v.vloger_id as vlogerId,
+          u.face as vlogerFace,
+          u.nickname as vlogerName,
+          v.title as content,
+          v.url as url,
+          v.cover as cover,
+          v.width as width,
+          v.height as height,
+          v.like_counts as likecounts,
+          v.comments_counts as commentsCounts,
+          v.is_private as isPrivate
+        FROM
+          vlog v <!-- 主键，从vlog表中找数据 -->
+        LEFT JOIN
+          my_liked_vlog mlv <!-- 点赞表 -->
+        ON
+          v.id = mlv.vlog_id <!-- 通过点赞表的vlog_id和视频表的id进行关联 -->
+        LEFT JOIN
+          users u
+        ON
+          mlv.user_id = u.id <!-- 通过点赞表的user_id和用户表的id进行关联 -->
+        WHERE
+          u.id = #{paramMap.userId} <!-- 最后的最后，具体是哪一个用户 -->
+        AND
+          v.is_private = 0  <!-- 因为你点赞过的视频，该视频博主可能设置为私密了，所以这里得判断 -->
+        ORDER BY
+          v.created_time
+    </select>
+
+
+
+    <!-- 多表查询(查询出我所关注的那些博主所发布的短视频列表) -> vlog表、fans表、user表 -->
+    <select id="getMyFollowVlogList" parameterType="map" resultType="com.yufeng.vo.IndexVlogVO">
+        SELECT
+            v.id as vlogId,
+            v.vloger_id as vlogerId,
+            u.face as vlogerFace,
+            u.nickname as vlogerName,
+            v.title as content,
+            v.url as url,
+            v.cover as cover,
+            v.width as width,
+            v.height as height,
+            v.like_counts as likeCounts,
+            v.comments_counts as commentsCounts,
+            v.is_private as isPrivate
+        FROM
+            vlog v <!-- 从vlog表中，找出所有的视频 -->
+        LEFT JOIN
+            fans f
+        ON
+            v.vloger_id = f.vloger_id <!-- 用vloger_id进行两张表的关联(两张表都有相同的vloger_id字段，vloger_id既能知道发布了哪些视频「vlog表」，也能知道谁关注了我「fans表」) -->
+        LEFT JOIN
+            users u
+        ON
+            f.vloger_id = u.id  <!-- vloger_id，实则也是user_id，通过vloger_id又能知道user表中的信息了 -->
+        WHERE
+            f.fan_id = #{paramMap.myId} <!-- 最后的最后，查出了很多记录，而f.fan_id = 当前用户id是最后的判断，从所有的视频中筛选出来 -->
+        AND
+            v.is_private = 0
+        ORDER BY
+            v.created_time
+        DESC
+    </select>
+
+
+
+    <!-- 多表查询(查询出我朋友(与我互粉)所发布的短视频列表) -> vlog表、fans表、user表 -->
+        <select id="getMyFriendVlogList" parameterType="map" resultType="com.yufeng.vo.IndexVlogVO">
+        SELECT
+            v.id as vlogId,
+            v.vloger_id as vlogerId,
+            u.face as vlogerFace,
+            u.nickname as vlogerName,
+            v.title as content,
+            v.url as url,
+            v.cover as cover,
+            v.width as width,
+            v.height as height,
+            v.like_counts as likeCounts,
+            v.comments_counts as commentsCounts,
+            v.is_private as isPrivate
+        FROM
+            vlog v <!-- 从vlog表中，找出所有的视频 -->
+        LEFT JOIN
+            fans f
+        ON
+            v.vloger_id = f.fan_id <!-- 视频的发布者，都是我的粉丝 -->
+        LEFT JOIN
+            users u
+        ON
+            f.fan_id = u.id  <!-- 查询出粉丝的信息(比如头像、昵称) -->
+        WHERE
+            f.vloger_id = #{paramMap.myId} <!-- 我是被粉丝关注的那个！ -->
+        AND
+            v.is_private = 0
+        AND
+            f.is_fan_friend_of_mine = 1 <!-- 有了这个属性，就知道我有没有关注这个粉丝，不然就得四张表来查询 -->
+        ORDER BY
+            v.created_time
+        DESC
+    </select>
+
+</mapper>

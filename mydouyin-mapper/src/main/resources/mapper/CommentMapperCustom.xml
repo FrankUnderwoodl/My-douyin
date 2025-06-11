@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yufeng.mapper.CommentMapperCustom" >
+
+  <!--
+      FIXME
+      思考：阿里规范明确规定不能超过三表关联，这里达到了四张表
+      我们应该如何优化呢？使得sql脚本查询表位三表或者两表查询
+      来实现呢又或者说我们能不能不使用数据库，使用别的手段（中间件）？
+   -->
+  <!-- 当用户点击评论图标，向数据中查询该视频的每一条评论 -->
+  <!-- 为什么要两张comment来查询呢？ 因为不仅仅要获得评论者的信息，也要获得被回复用户信息 -->
+  <select id="getCommentList" parameterType="map" resultType="com.yufeng.vo.CommentVO">
+    SELECT
+      c.id as commentId, <!-- 评论id(主键) -->
+      c.vlog_id  as vlogId, <!-- 视频id(外键) -->
+      c.comment_user_id as commentUserId, <!-- 评论发布者的id(comment表中) -->
+      u.id as vlogerId, <!--评论发布者的id(user表中) -->
+      u.nickname as commentUserNickname, <!-- 评论发布者的昵称 -->
+      u.face as commentUserFace, <!-- 评论发布者的头像 -->
+
+      c.father_comment_id as fatherCommentId, <!-- 被回复的评论id(外键) -->
+      c.like_counts as likeCounts, <!-- 点赞数 -->
+      fu.nickname as replyedUserNickname, <!-- 被回复用户的昵称 -->
+
+      c.content as content, <!-- 评论内容 -->
+      c.create_time as createTime <!-- 评论创建时间 -->
+    FROM
+      `comment` as c  <!-- 选出所有的评论 -->
+    LEFT JOIN
+      users as u
+    ON
+      c.comment_user_id = u.id <!-- 有了comment_user_id这个字段，就可以通过user表来获取评论人的头像、昵称 -->
+
+    LEFT JOIN
+      `comment` as fc <!-- 再来一张comment表，查询被回复用户的信息(所有评论的father_comment_id默认为"0") -->
+    ON
+      c.father_comment_id = fc.id <!-- 通过father_comment_id来查询被回复用户的那条评论id，默认father_comment_id为0，也就是没有父评论 -->
+    LEFT JOIN
+      users as fu <!-- 查询父评论者的相关信息，也就是昵称 -->
+    ON
+      fc.comment_user_id = fu.id  <!-- (如果没有被回复，那这个father_comment_id就默认为0呗，则在user中查询出的是一个null) -->
+    WHERE
+      c.vlog_id = #{paramMap.vlogId}  <!-- 通过vlogId来筛选评论 -->
+    ORDER BY
+      c.like_counts DESC,
+      c.create_time DESC
+  </select>
+
+</mapper>

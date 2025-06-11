@@ -3,7 +3,9 @@ package com.yufeng;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import tk.mybatis.spring.annotation.MapperScan;
+
 
 /**
  * @author Lzm
@@ -23,6 +25,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.yufeng", "org.n3r.idworker"})
 @MapperScan(basePackages = {"com.yufeng.mapper"})
+@EnableMongoRepositories
 public class Application {
     public static void main(String[] args) {
         // 1. 启动 Spring Boot 应用

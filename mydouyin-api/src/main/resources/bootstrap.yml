@@ -1,0 +1,9 @@
+# 启动优先级是高于application.yml的，所以专门用来做一些启动时的配置
+spring:
+  application:
+    name: mydouyin-nacos  # 应用名称，注册到Nacos时使用
+  cloud:
+    nacos:
+      config:
+       server-addr: localhost:8848 # Nacos配置服务地址
+       file-extension: yaml # 配置文件的扩展名
